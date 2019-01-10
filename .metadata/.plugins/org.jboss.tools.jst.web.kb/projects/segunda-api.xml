@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kb-project>
+ <depends-on-projects/>
+ <used-by-projects/>
+ <paths>
+  <path value="C:/Users/E514189/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar"/>
+ </paths>
+ <validation>
+  <core validator-id="jsf-verification"/>
+  <core validator-id="jboss.cdi.core"/>
+  <core validator-id="jboss.jsf.core"/>
+  <el>
+   <linked-el length="21" name="%0" offset="2190" path="%1"/>
+   <linked-el length="21" name="%2" offset="2190" path="%1"/>
+  </el>
+ </validation>
+ <aliases>
+  <alias path="/segunda-api/pom.xml" value="%1"/>
+  <alias path="project.artifactId" value="%0"/>
+  <alias path="project" value="%2"/>
+ </aliases>
+ <includes/>
+ <uris/>
+</kb-project>
