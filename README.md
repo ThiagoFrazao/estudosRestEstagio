@@ -1,2 +1,3 @@
-# estudosRestEstagio
-Estudos para criar uma API RESTful utilizando Jersey, Apache Tomcat e HSQLDB em um Projeto MAVEN para controle de dependências..
+# Estudos Rest Estagio
+
+Estudos para criar uma API RESTful utilizando Jersey e JAX-RS, JBoss EAP como servidor, HSQLDB para persistência e Maven para controle de dependências.
