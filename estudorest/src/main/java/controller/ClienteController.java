@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -21,7 +22,7 @@ import org.glassfish.jersey.server.ManagedAsync;
 
 import dao.ClienteDAO;
 import entidades.Cliente;
-import erros.ClienteException;
+import erros.DAOException;
 import utils.Resposta;
 
 
@@ -33,7 +34,6 @@ public class ClienteController {
 	@Inject
 	private ClienteDAO clienteDAO;
 	
-	
 	@GET
 	@ManagedAsync
 	@Path("/listar")
@@ -43,8 +43,8 @@ public class ClienteController {
 		try {
 			clientes = clienteDAO.listarClientes();
 			retorno = Resposta.montarResposta(Status.OK, clientes);
-		} catch (ClienteException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		
 		response.resume(retorno);
@@ -58,8 +58,8 @@ public class ClienteController {
 		try {
 			Cliente cliente = clienteDAO.procurarCliente(id);
 			retorno = Resposta.montarResposta(Status.OK, cliente);
-		} catch (ClienteException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		response.resume(retorno);	
 	}
@@ -72,10 +72,9 @@ public class ClienteController {
 		try {			
 			Cliente cliente = clienteDAO.procurarCliente(primeiroNome,segundoNome);
 			retorno = Resposta.montarResposta(Status.OK, cliente);
-		} catch (ClienteException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-	}
-		
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
+		}		
 		response.resume(retorno);	
 	}
 	
@@ -89,22 +88,22 @@ public class ClienteController {
 			if(!clienteDAO.verificarExistenciaCliente(novoCliente.getPrimeiroNome(), novoCliente.getSegundoNome())){
 				try {
 					clienteDAO.adicionarCliente(novoCliente);
-				} catch (ClienteException e) {
-					retorno = Resposta.respostaErro(e.getMessage());
+				} catch (DAOException e) {
+					retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 				}
 				retorno = Resposta.montarRespostaSucesso();
 			}else{
-				String msg = "Cliente "+ novoCliente.getPrimeiroNome()+ " " + novoCliente.getSegundoNome() + " j� cadastrado.";
-				retorno = Resposta.respostaErro(msg);
+				String msg = "Cliente "+ novoCliente.getPrimeiroNome()+ " " + novoCliente.getSegundoNome() + " ja esta cadastrado.";
+				retorno = Resposta.montarResposta(Status.CONFLICT, msg);
 			}	
 		}else{
-			String msg = "Informa��es insuficientes para registrar cliente.";
-			retorno = Resposta.respostaErro(msg);
+			String msg = "Informacoes insuficientes para registrar cliente.";
+			retorno = Resposta.montarResposta(Status.BAD_REQUEST,msg);
 		}			
 		response.resume(retorno);
 	}
 	
-	@POST
+	@PUT
 	@ManagedAsync
 	@Path("/update")
 	public void atualizarCliente(Cliente cliente, @Suspended AsyncResponse response){
@@ -118,8 +117,8 @@ public class ClienteController {
 		try {
 			clienteDAO.atualizarCliente(primeiroNome, segundoNome, novaRua, novaCidade);
 			retorno = Resposta.montarRespostaSucesso();
-		} catch (ClienteException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}
 		
 		response.resume(retorno);
@@ -139,12 +138,12 @@ public class ClienteController {
 				clienteDAO.deletarCliente(cliente.getId());
 			}
 			else{
-				retorno = Resposta.respostaErro();
-			}
-			
+				String msg = "Informacoes insuficientes para encontrar Cliente.";
+				retorno = Resposta.montarResposta(Status.BAD_REQUEST,msg);
+			}			
 			retorno = Resposta.montarRespostaSucesso();
-		} catch (ClienteException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		response.resume(retorno);
 	}

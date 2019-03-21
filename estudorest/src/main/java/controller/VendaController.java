@@ -24,8 +24,7 @@ import org.glassfish.jersey.server.ManagedAsync;
 import dao.VendaDAO;
 import entidades.Cliente;
 import entidades.Venda;
-import erros.ClienteException;
-import erros.VendaException;
+import erros.DAOException;
 import utils.Resposta;
 
 @Path("/loja/vendas")
@@ -45,8 +44,8 @@ public class VendaController {
 		try {
 			ArrayList<Venda> vendas = vendaDAO.listarVendas();
 			retorno = Resposta.montarResposta(Status.OK, vendas);
-		} catch (ClienteException | VendaException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		response.resume(retorno);
 	}
@@ -61,8 +60,8 @@ public class VendaController {
 		try {
 			vendas = vendaDAO.procurarVendasCliente(id);
 			retorno = Resposta.montarResposta(Status.OK, vendas);			
-		} catch (VendaException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		response.resume(retorno);
 	}
@@ -77,8 +76,8 @@ public class VendaController {
 		try {
 			vendas = vendaDAO.procurarVendasCliente(primeiroNome, segundoNome);
 			retorno = Resposta.montarResposta(Status.OK, vendas);
-		} catch (ClienteException | VendaException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}
 		
 		response.resume(retorno);	
@@ -94,13 +93,10 @@ public class VendaController {
 		try {
 			totalVendas = vendaDAO.totalVendasCliente(id);
 			String msg = "O total do custo de vendas do ID " + id  +  " � R$ " + totalVendas + " .";
-			retorno = Resposta.respostaSucesso(msg);
-			
-			
-		} catch (VendaException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-		}
-		
+			retorno = Resposta.montarResposta(Status.OK, msg);			
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
+		}		
 		response.resume(retorno);
 	}
 	
@@ -114,9 +110,9 @@ public class VendaController {
 		try {
 			totalVendas = vendaDAO.totalVendasCliente(primeiroNome, segundoNome);
 			String msg = "O total do custo de vendas do Cliente "+ primeiroNome + " " + segundoNome + " � R$ " + totalVendas + " .";
-			retorno = Resposta.respostaSucesso(msg);
-		} catch (ClienteException | VendaException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+			retorno = Resposta.montarResposta(Status.OK, msg);
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}
 		
 		response.resume(retorno);		
@@ -132,8 +128,8 @@ public class VendaController {
 			try {
 				vendaDAO.adicionarVenda(novaVenda);
 				retorno = Resposta.montarRespostaSucesso();
-			} catch (VendaException | ClienteException e) {
-				retorno = Resposta.respostaErro(e.getMessage());
+			} catch (DAOException e) {
+				retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 			}
 		}		
 		response.resume(retorno);
@@ -148,10 +144,9 @@ public class VendaController {
 		try {
 			vendaDAO.deletarVenda(idVenda);
 			retorno = Resposta.montarRespostaSucesso();
-		} catch (VendaException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-		}
-		
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
+		}		
 		response.resume(retorno);
 	}
 	
@@ -170,13 +165,12 @@ public class VendaController {
 					retorno = Resposta.montarRespostaSucesso();
 				}			
 				else{
-					String msg = "Informa��es insuficientes para deletar vendas.";
-					retorno = Resposta.respostaErro(msg);
+					String msg = "Informacoes insuficientes para deletar vendas.";
+					retorno = Resposta.montarResposta(Status.BAD_REQUEST, msg);
 				}
-		}catch (VendaException | ClienteException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-		}		
-		
+		}catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
+		}				
 		response.resume(retorno);
 	}
 

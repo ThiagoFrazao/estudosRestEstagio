@@ -9,9 +9,10 @@ import java.util.List;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response.Status;
 
 import entidades.Cliente;
-import erros.ClienteException;
+import erros.DAOException;
 
 @Dependent
 public class ClienteDAO {
@@ -19,7 +20,7 @@ public class ClienteDAO {
 	@Inject
 	private ConexaoDAO dao;	
 	
-	public int adicionarCliente(Cliente novoCliente) throws ClienteException{
+	public int adicionarCliente(Cliente novoCliente) throws DAOException{
 		
 		int retorno = -1;
 		String sql = "insert into CLIENTE (PRIMNOME,SEGNOME,RUA,CIDADE) values (?,?,?,?)";
@@ -38,18 +39,14 @@ public class ClienteDAO {
 			con.close();
 			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new ClienteException();
-			
-		}
-		
+			throw new DAOException();			
+		}		
 		return retorno;
 	}
 	
 	
 	
-	public Cliente procurarCliente(int id) throws ClienteException{
+	public Cliente procurarCliente(int id) throws DAOException{
 		
 		Cliente retorno = null;
 		String sql = "select * from CLIENTE where ID=?";
@@ -65,7 +62,7 @@ public class ClienteDAO {
 				stmt.close();
 				con.close();
 				String msg = "O ID informado nao correspende a um usuario.";
-				throw new ClienteException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			retorno = new Cliente(id);
@@ -79,15 +76,12 @@ public class ClienteDAO {
 			con.close();
 			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage() + "\n Classe CostumerDAO \n Metodo recuperarCustomer(id)");
-			e.printStackTrace();
-			throw new ClienteException();
-		}
-		
+			throw new DAOException();
+		}		
 		return retorno;	
 	}
 	
-	public Cliente procurarCliente(String primeiroNome, String segundoNome) throws ClienteException{
+	public Cliente procurarCliente(String primeiroNome, String segundoNome) throws DAOException{
 		
 		Cliente retorno = null;
 		String sql = "select * from CLIENTE where PRIMNOME=? and SEGNOME=?";
@@ -104,7 +98,7 @@ public class ClienteDAO {
 				stmt.close();
 				con.close();
 				String msg = "O Nome informado nao correspende a um Cliente.";
-				throw new ClienteException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			retorno = new Cliente(rs.getInt(1));
@@ -118,15 +112,12 @@ public class ClienteDAO {
 			con.close();
 			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new ClienteException();
-		}
-		
+			throw new DAOException();
+		}		
 		return retorno;	
 	}
 	
-	public List<Cliente> listarClientes() throws ClienteException{
+	public List<Cliente> listarClientes() throws DAOException{
 		List<Cliente> retorno = new ArrayList<Cliente>();
 		Cliente cliente;
 		String sql = "select * from CLIENTE";
@@ -136,8 +127,7 @@ public class ClienteDAO {
 			PreparedStatement stmt = con.prepareStatement(sql);
 			ResultSet rs = stmt.executeQuery();
 			
-			while(rs.next()){
-				
+			while(rs.next()){				
 				cliente = new Cliente(rs.getInt(1));
 				cliente.setPrimeiroNome(rs.getString(2));
 				cliente.setSegundoNome(rs.getString(3));
@@ -148,18 +138,14 @@ public class ClienteDAO {
 			}
 			rs.close();
 			stmt.close();
-			con.close();
-			
+			con.close();			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new ClienteException();
-		}
-		
+			throw new DAOException();
+		}		
 		return retorno;
 	}
 	
-	public int deletarCliente(int id) throws ClienteException{
+	public int deletarCliente(int id) throws DAOException{
 		int retorno = -1;
 		String sql = "delete from CLIENTE where ID=?";
 		
@@ -174,24 +160,21 @@ public class ClienteDAO {
 			con.close();
 			if(retorno == 0){						
 				String msg = "O ID informado não correspende a um Cliente.";
-				throw new ClienteException(msg);				
+				throw new DAOException(msg,Status.NOT_FOUND);				
 			}
-		} catch (SQLException e) {
-			
-			System.out.println("SQLException " + e.getMessage());			
+		} catch (SQLException e) {			
 			if(e.getSQLState().equals("23000")){
 				String msg = "Este Cliente tem uma venda cadastrada. Clientes com vendas cadastradas nao podem ser deletados.";
-				throw new ClienteException(msg);
+				throw new DAOException(msg,Status.FORBIDDEN);
 			}else{
 				e.printStackTrace();
-				throw new ClienteException();
+				throw new DAOException();
 			}			
-		}
-		
+		}		
 		return retorno;
 	}
 	
-	public int deletarCliente(String primeiroNome, String segundoNome) throws ClienteException{
+	public int deletarCliente(String primeiroNome, String segundoNome) throws DAOException{
 		int retorno = -1;
 		String sql = "delete from CLIENTE where PRIMNOME=? and SEGNOME=?";
 		
@@ -207,25 +190,22 @@ public class ClienteDAO {
 			con.close();
 			if(retorno == 0){						
 				String msg = "O Nome informado nao correspende a um Cliente.";
-				throw new ClienteException(msg);				
+				throw new DAOException(msg,Status.NOT_FOUND);				
 			}
 		} catch (SQLException e) {
-			System.out.println("SQLException \n" + e.getMessage());
-			
 			if(e.getSQLState().equals("23000")){
 				String msg = "Este Cliente tem uma Venda cadastrada. Clientes com Vendas cadastradas nao podem ser deletados.";
-				throw new ClienteException(msg);
+				throw new DAOException(msg,Status.FORBIDDEN);
 			}
 			else{
-				e.printStackTrace();
-				throw new ClienteException();
+				throw new DAOException();
 			}	
 		}
 		
 		return retorno;
 	}
 	
-	public int atualizarCliente(int id, String novaRua, String novaCidade) throws ClienteException{
+	public int atualizarCliente(int id, String novaRua, String novaCidade) throws DAOException{
 		
 		int retorno = -1;
 		String sql = "update CLIENTE set RUA=?, CIDADE=? where ID=?";
@@ -243,19 +223,17 @@ public class ClienteDAO {
 			con.close();
 			if(retorno == 0){
 				String msg = "O ID informado nao corresponde a um Cliente.";
-				throw new ClienteException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new ClienteException();
+			throw new DAOException();
 		}
 		
 		return retorno;
 		
 	}
 	
-public int atualizarCliente(String primeiroNome,String segundoNome, String novaRua, String novaCidade) throws ClienteException{
+public int atualizarCliente(String primeiroNome,String segundoNome, String novaRua, String novaCidade) throws DAOException{
 		
 		int retorno = -1;
 		String sql = "update CLIENTE set RUA=?, CIDADE=? where PRIMNOME=? and SEGNOME=?";
@@ -274,19 +252,17 @@ public int atualizarCliente(String primeiroNome,String segundoNome, String novaR
 			con.close();
 			if(retorno == 0){
 				String msg = "O nome informado nao corresponde a um Cliente.";
-				throw new ClienteException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new ClienteException();
+			throw new DAOException();
 		}
 		
 		return retorno;
 		
 	}
 	
-	public boolean verificarExistenciaCliente(int id) throws ClienteException{
+	public boolean verificarExistenciaCliente(int id) throws DAOException{
 		boolean retorno = false;
 		String sql = "select ID from CLIENTE where ID=?";
 		
@@ -303,9 +279,7 @@ public int atualizarCliente(String primeiroNome,String segundoNome, String novaR
 			con.close();
 			
 		} catch (SQLException e) {
-			System.out.println("SQLException \n" + e.getMessage());
-			e.printStackTrace();
-			throw new ClienteException();
+			throw new DAOException();
 		}
 		
 		return retorno;
@@ -335,18 +309,4 @@ public int atualizarCliente(String primeiroNome,String segundoNome, String novaR
 		
 		return retorno;
 	}
-	
-/*
-	public static void main(String[] args) throws ClienteException {
-		
-		ClienteDAO teste = new ClienteDAO();
-		//System.out.println(teste.adicionarCliente(new Cliente("teste","teste","teste","teste")));
-		//System.out.println(teste.recuperarCliente("teste","teste").toString());
-		//System.out.println(teste.deletarCliente(0));
-		//System.out.println(teste.verificarExistenciaCliente(10));
-		teste.listarClientes().forEach(cliente -> System.out.println(cliente.toString()));
-	}
-*/
-	
-
 }

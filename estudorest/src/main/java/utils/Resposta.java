@@ -27,6 +27,11 @@ public class Resposta {
 		return Response.status(Status.OK).entity(mensagem).build();		
 	}
 	
+	public static Response montarRespostaSucesso(Status st){
+		String mensagem = formatarMensagem("Operação efetuada com sucesso.");		
+		return Response.status(st).entity(mensagem).build();		
+	}
+	
 	private static String formatarMensagem(String msg){		
 		String resposta = "{ \"resposta\": \"" + msg + "\" }";		
 		return resposta;

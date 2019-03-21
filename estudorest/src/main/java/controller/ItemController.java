@@ -7,6 +7,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -22,9 +23,7 @@ import dao.ItemDAO;
 import entidades.Item;
 import entidades.Produto;
 import entidades.Venda;
-import erros.ItensException;
-import erros.ProdutoException;
-import erros.VendaException;
+import erros.DAOException;
 import utils.Resposta;
 
 @Path("/loja/item")
@@ -44,8 +43,8 @@ public class ItemController {
 		try {
 			List<Item> itens = itemDAO.procurarItensVenda(idVenda);
 			retorno = Resposta.montarResposta(Status.OK, itens);
-		} catch (VendaException | ProdutoException | ItensException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}
 		
 		response.resume(retorno);
@@ -59,10 +58,9 @@ public class ItemController {
 		try {
 			List<Item> itens = itemDAO.procurarItensProduto(idProduto);
 			retorno = Resposta.montarResposta(Status.OK, itens);
-		} catch (VendaException | ProdutoException | ItensException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-		}
-		
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
+		}		
 		response.resume(retorno);
 	}
 	
@@ -74,10 +72,9 @@ public class ItemController {
 		try {
 			Item item = itemDAO.procurarItem(codItem);
 			retorno = Resposta.montarResposta(Status.OK, item);
-		} catch (VendaException | ProdutoException | ItensException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-		}
-		
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
+		}		
 		response.resume(retorno);
 	}
 	
@@ -89,8 +86,8 @@ public class ItemController {
 		try {
 			List<Item> todosItens = itemDAO.listarTodosItens();
 			retorno = Resposta.montarResposta(Status.OK, todosItens);
-		} catch (VendaException | ProdutoException | ItensException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}
 		
 		response.resume(retorno);
@@ -104,14 +101,14 @@ public class ItemController {
 		
 		try {
 			itemDAO.adicionarItem(novoItem);
-			retorno = Resposta.montarRespostaSucesso();
-		} catch (ItensException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+			retorno = Resposta.montarRespostaSucesso(Status.CREATED);
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		response.resume(retorno);
 	}
 	
-	@POST
+	@PUT
 	@ManagedAsync
 	@Path("/update")
 	public void atualizarItem(Item novoItem, @Suspended AsyncResponse response){
@@ -134,10 +131,10 @@ public class ItemController {
 			}
 			else{
 				String msg = "Dados insuficientes para a atualizacao.";
-				retorno = Resposta.respostaErro(msg);
+				retorno = Resposta.montarResposta(Status.BAD_REQUEST, msg);
 			} 
-		} catch (ItensException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		response.resume(retorno);
 	}
@@ -146,13 +143,12 @@ public class ItemController {
 	@ManagedAsync
 	@Path("/delete/venda/{idVenda}")
 	public void removerItensVenda(@PathParam("idVenda") int idVenda, @Suspended AsyncResponse response){
-		Response retorno = null;
-		
+		Response retorno = null;		
 		try {
 			itemDAO.removerVendaItens(idVenda);
 			retorno = Resposta.montarRespostaSucesso();
-		} catch (ItensException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		response.resume(retorno);
 	}
@@ -161,13 +157,12 @@ public class ItemController {
 	@ManagedAsync
 	@Path("/delete/produto/{idProduto}")
 	public void removerItensProduto(@PathParam("idProduto") int idProduto, @Suspended AsyncResponse response){
-		Response retorno = null;
-		
+		Response retorno = null;		
 		try {
 			itemDAO.removerProdutosItens(idProduto);
 			retorno = Resposta.montarRespostaSucesso();
-		} catch (ItensException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		response.resume(retorno);
 	}
@@ -181,11 +176,9 @@ public class ItemController {
 		try {
 			itemDAO.removerItens(codItem);
 			retorno = Resposta.montarRespostaSucesso();
-		} catch (ItensException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
 		response.resume(retorno);
 	}
-	
-
 }

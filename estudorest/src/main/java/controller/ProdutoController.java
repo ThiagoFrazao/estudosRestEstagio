@@ -7,6 +7,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -21,7 +22,7 @@ import org.glassfish.jersey.server.ManagedAsync;
 
 import dao.ProdutoDAO;
 import entidades.Produto;
-import erros.ProdutoException;
+import erros.DAOException;
 import utils.Resposta;
 
 @Path("/loja/produto")
@@ -40,8 +41,8 @@ public class ProdutoController {
 		try {
 			Produto produtos = produtoDAO.procurarProduto(id);
 			retorno = Resposta.montarResposta(Status.OK, produtos);
-		} catch (ProdutoException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}
 				
 		response.resume(retorno);
@@ -55,9 +56,8 @@ public class ProdutoController {
 		try {
 			ArrayList<Produto> produtos = produtoDAO.procurarProdutoMaior(preco);
 			retorno = Resposta.montarResposta(Status.OK, produtos);
-		} catch (ProdutoException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-			e.printStackTrace();
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}
 		response.resume(retorno);
 	}
@@ -70,9 +70,8 @@ public class ProdutoController {
 		try {
 			ArrayList<Produto> produtos = produtoDAO.procurarProdutoMenor(preco);
 			retorno = Resposta.montarResposta(Status.OK, produtos);
-		} catch (ProdutoException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-			e.printStackTrace();
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}
 		response.resume(retorno);
 	}
@@ -85,9 +84,8 @@ public class ProdutoController {
 		try {
 			ArrayList<Produto> produtos = produtoDAO.procurarProdutoFaixa(menor, maior);
 			retorno = Resposta.montarResposta(Status.OK, produtos);
-		} catch (ProdutoException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-			e.printStackTrace();
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}
 		response.resume(retorno);
 	}
@@ -100,32 +98,27 @@ public class ProdutoController {
 		try {
 			ArrayList<Produto> produtos = produtoDAO.listarProdutos();
 			retorno = Resposta.montarResposta(Status.OK, produtos);
-		} catch (ProdutoException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-		}
-				
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
+		}				
 		response.resume(retorno);
 	}
 	
 	@POST
 	@ManagedAsync
 	@Path("/add")
-	public void adicionarProdutoNovo(Produto novoProduto, @Suspended AsyncResponse response){
-	
-		Response retorno = null;
-		
+	public void adicionarProdutoNovo(Produto novoProduto, @Suspended AsyncResponse response){	
+		Response retorno = null;		
 		try {
 			produtoDAO.adicionarProduto(novoProduto);
-			retorno = Resposta.montarRespostaSucesso();
-		} catch (ProdutoException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
+			retorno = Resposta.montarRespostaSucesso(Status.CREATED);
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
-		response.resume(retorno);
-		
-		
+		response.resume(retorno);		
 	}
 	
-	@POST
+	@PUT
 	@ManagedAsync
 	@Path("/update")
 	public void atualizarProduto(Produto novoProduto, @Suspended AsyncResponse response){
@@ -135,11 +128,11 @@ public class ProdutoController {
 			try {
 				produtoDAO.atualizarProduto(novoProduto.getId(), novoProduto.getNome(), novoProduto.getPreco());
 				retorno = Resposta.montarRespostaSucesso();
-			} catch (ProdutoException e) {
-				retorno = Resposta.respostaErro(e.getMessage());
+			} catch (DAOException e) {
+				retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 			}
 		}else{
-			retorno = Resposta.respostaErro("Informacoes insuficientes.");
+			retorno = Resposta.montarResposta(Status.BAD_REQUEST, "Informacoes insuficientes.");
 		}		
 		response.resume(retorno);
 	}
@@ -148,15 +141,13 @@ public class ProdutoController {
 	@ManagedAsync
 	@Path("/delete/{id}")
 	public void removerProduto(@PathParam("id") int id, @Suspended AsyncResponse response){
-		Response retorno = null;
-		
+		Response retorno = null;		
 		try {
 			produtoDAO.removerProduto(id);
 			retorno = Resposta.montarRespostaSucesso();
-		} catch (ProdutoException e) {
-			retorno = Resposta.respostaErro(e.getMessage());
-		}
-		
+		} catch (DAOException e) {
+			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
+		}		
 		response.resume(retorno);
 	}
 

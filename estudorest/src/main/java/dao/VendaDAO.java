@@ -8,11 +8,11 @@ import java.util.ArrayList;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response.Status;
 
 import entidades.Cliente;
 import entidades.Venda;
-import erros.ClienteException;
-import erros.VendaException;
+import erros.DAOException;
 
 @Dependent
 public class VendaDAO {
@@ -23,7 +23,7 @@ public class VendaDAO {
 	@Inject
 	private ClienteDAO clientes;
 	
-	public int adicionarVenda(Venda novaVenda) throws VendaException, ClienteException{
+	public int adicionarVenda(Venda novaVenda) throws DAOException{
 		
 		int retorno = -1;
 		String sql = "insert into VENDA (CLIENTEID,TOTAL) values (?,?)";
@@ -41,18 +41,17 @@ public class VendaDAO {
 				stmt.close();
 				
 			} catch (SQLException e) {
-				System.out.println("SQLException " + e.getMessage());
-				e.printStackTrace();
+				throw new DAOException();
 			}
 		}else{
 			String msg = "Toda Venda deve ter um Cliente cadastrado para ser realizada.";
-			throw new VendaException(msg);
+			throw new DAOException(msg,Status.FORBIDDEN);
 		}
 		
 		return retorno;
 	}
 	
-	public int deletarVenda(int id) throws VendaException{
+	public int deletarVenda(int id) throws DAOException{
 		int retorno = -1;
 		String sql = "delete from VENDA where ID=?";
 		
@@ -64,24 +63,22 @@ public class VendaDAO {
 			retorno = stmt.executeUpdate();
 			stmt.close();
 			if(retorno == 0){
-				String msg = "O ID informado n�o corresponde a uma Venda.";
-				throw new VendaException(msg);
+				String msg = "O ID informado nao corresponde a uma Venda.";
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 		} catch (SQLException e) {
 			if(e.getSQLState().equals("23000")){
 				String msg = "A Venda informada possui Itens cadastrados. Vendas com Itens nao podem ser deletadas.";
-				throw new VendaException(msg);
+				throw new DAOException(msg,Status.FORBIDDEN);
 			}else{
-				System.out.println("SQLException " + e.getMessage());
-				e.printStackTrace();
-				throw new VendaException();	
+				throw new DAOException();	
 			}			
 		}		
 		
 		return retorno;
 	}
 	
-	public int deletarVendasCliente(int idCliente) throws VendaException{
+	public int deletarVendasCliente(int idCliente) throws DAOException{
 		int retorno = -1;
 		String sql = "delete from VENDA where CLIENTEID=?";
 		
@@ -93,20 +90,16 @@ public class VendaDAO {
 			retorno = stmt.executeUpdate();
 			stmt.close();
 			if(retorno == 0){
-				String msg = "O Cliente informado n�o possui Vendas cadastradas.";
-				throw new VendaException(msg);
-				
+				String msg = "O Cliente informado nao possui Vendas cadastradas.";
+				throw new DAOException(msg,Status.NOT_FOUND);				
 			}
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new VendaException();	
-		}		
-		
+			throw new DAOException();	
+		}				
 		return retorno;
 	}
 	
-	public int deletarVendasCliente(String primeiroNome, String segundoNome) throws VendaException, ClienteException{
+	public int deletarVendasCliente(String primeiroNome, String segundoNome) throws DAOException{
 		int retorno = -1;
 		String sql = "delete from VENDA where CLIENTEID=?";
 		
@@ -120,23 +113,20 @@ public class VendaDAO {
 			stmt.close();
 			if(retorno == 0){
 				String msg = "O Cliente informado não possui Vendas cadastradas.";
-				throw new VendaException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 		} catch (SQLException e) {
 			if(e.getSQLState().equals("23000")){
 				String msg = "As Vendas desse Cliente possuem Itens cadastrados. Vendas com Itens nao podem ser deletadas.";
-				throw new VendaException(msg);
+				throw new DAOException(msg,Status.FORBIDDEN);
 			}else{
-				System.out.println("SQLException " + e.getMessage());
-				e.printStackTrace();
-				throw new VendaException();	
+				throw new DAOException();	
 			}	
-		}		
-		
+		}				
 		return retorno;
 	}
 	
-	public ArrayList<Venda> listarVendas() throws ClienteException, VendaException{
+	public ArrayList<Venda> listarVendas() throws DAOException{
 		Venda venda;
 		Cliente cliente;
 		float total;
@@ -162,13 +152,13 @@ public class VendaDAO {
 			con.close();
 			
 		} catch (SQLException e) {
-			throw new VendaException();
+			throw new DAOException();
 		}		
 		return vendas;	
 	}
 	
 	
-	public Venda procurarVenda(int id) throws VendaException{
+	public Venda procurarVenda(int id) throws DAOException{
 		
 		Venda retorno = null;
 		Cliente cliente = null;
@@ -187,7 +177,7 @@ public class VendaDAO {
 				rs.close();
 				stmt.close();
 				String msg = "O ID informado não corresponde a uma Venda.";
-				throw new VendaException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			retorno = new Venda(id);
@@ -201,18 +191,13 @@ public class VendaDAO {
 			con.close();
 			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new VendaException();	
-		} catch (ClienteException e) {
-			System.out.println("ClienteException " + e.getMessage());
-			e.printStackTrace();
-		}	
+			throw new DAOException();	
+		} 
 		
 		return retorno;		
 	}
 	
-	public ArrayList<Venda> procurarVendasCliente(int idCliente) throws VendaException{
+	public ArrayList<Venda> procurarVendasCliente(int idCliente) throws DAOException{
 		
 		Venda venda = null;
 		Cliente cliente = null;
@@ -230,7 +215,7 @@ public class VendaDAO {
 				stmt.close();
 				con.close();
 				String msg = "O Cliente informado não possui Vendas cadastradas.";
-				throw new VendaException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			venda = new Venda(rs.getInt(1));
@@ -251,29 +236,21 @@ public class VendaDAO {
 			
 			rs.close();
 			stmt.close();	
-			con.close();
-			
+			con.close();			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new VendaException();	
-		} catch (ClienteException e) {
-			System.out.println("ClienteException " + e.getMessage());
-			e.printStackTrace();
-		}	
-		
+			throw new DAOException();	
+		} 		
 		return retorno;		
 	}
 	
-	public ArrayList<Venda> procurarVendasCliente(String primeiroNome, String segundoNome) throws VendaException, ClienteException{
+	public ArrayList<Venda> procurarVendasCliente(String primeiroNome, String segundoNome) throws DAOException{
 		
 		Venda venda = null;
 		Cliente cliente = null;
 		ArrayList<Venda> retorno = new ArrayList<Venda>();
 		String sql = "select * from VENDA where CLIENTEID=?";
 		
-		try {
-			
+		try {			
 			cliente = clientes.procurarCliente(primeiroNome, segundoNome);
 			int idCliente = cliente.getId();
 			
@@ -287,7 +264,7 @@ public class VendaDAO {
 				stmt.close();
 				con.close();
 				String msg = "O Cliente informado não possui Vendas cadastradas.";
-				throw new VendaException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			venda = new Venda(rs.getInt(1));
@@ -311,15 +288,13 @@ public class VendaDAO {
 			con.close();
 			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new VendaException();	
+			throw new DAOException();	
 		}	
 		
 		return retorno;		
 	}
 	
-	public float totalVendasCliente(int idCliente) throws VendaException{
+	public float totalVendasCliente(int idCliente) throws DAOException{
 		float retorno = 0;
 		String sql = "select TOTAL from VENDA where CLIENTEID=?";		
 		
@@ -337,7 +312,7 @@ public class VendaDAO {
 				stmt.close();
 				con.close();
 				String msg = "O Cliente informado não possui Vendas cadastradas.";
-				throw new VendaException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			while(rs.next()){
@@ -349,16 +324,14 @@ public class VendaDAO {
 			con.close();
 			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new VendaException();	
+			throw new DAOException();	
 		}
 		
 		
 		return retorno;
 	}
 	
-	public float totalVendasCliente(String primeiroNome, String segundoNome) throws VendaException, ClienteException{
+	public float totalVendasCliente(String primeiroNome, String segundoNome) throws DAOException{
 		float retorno = 0;
 		String sql = "select TOTAL from VENDA where CLIENTEID=?";		
 		
@@ -379,7 +352,7 @@ public class VendaDAO {
 				stmt.close();
 				con.close();
 				String msg = "O Cliente informado não possui Vendas cadastradas.";
-				throw new VendaException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			while(rs.next()){
@@ -393,14 +366,14 @@ public class VendaDAO {
 		} catch (SQLException e) {
 			System.out.println("SQLException " + e.getMessage());
 			e.printStackTrace();
-			throw new VendaException();	
+			throw new DAOException();	
 		}
 		
 		
 		return retorno;
 	}
 	
-	public int atualizarVenda(int id, float total) throws VendaException{
+	public int atualizarVenda(int id, float total) throws DAOException{
 		int retorno = -1;
 		String sql = "update PRODUTO set TOTAL=? where ID=?";
 		
@@ -417,17 +390,15 @@ public class VendaDAO {
 			
 			if(retorno == 0){
 				String msg = "O ID informado não corresponde a uma Venda.";
-				throw new VendaException(msg);				
+				throw new DAOException(msg,Status.NOT_FOUND);				
 			}
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();			
-			throw new VendaException();			
+			throw new DAOException();			
 		}		
 		return retorno;
 	}
 	
-	public boolean verificarExistencia(int id){
+	public boolean verificarExistencia(int id) throws DAOException{
 		boolean retorno = false;
 		String sql = "select ID from VENDA where ID=? ";
 		
@@ -440,23 +411,10 @@ public class VendaDAO {
 			retorno = rs.next();
 			rs.close();
 			stmt.close();
-			con.close();
-			
+			con.close();			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-		}
-		
+			throw new DAOException();
+		}		
 		return retorno;
 	}
-/*	
-	public static void main(String[] args) throws VendaException {
-		VendaDAO vendas = new VendaDAO();
-		
-		vendas.deletarVenda(1);
-		
-	}
-*/
-
-
 }

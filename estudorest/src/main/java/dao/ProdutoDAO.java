@@ -8,9 +8,10 @@ import java.util.ArrayList;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response.Status;
 
 import entidades.Produto;
-import erros.ProdutoException;
+import erros.DAOException;
 
 @Dependent
 public class ProdutoDAO {
@@ -18,7 +19,7 @@ public class ProdutoDAO {
 	@Inject
 	private ConexaoDAO dao;	
 	
-	public int adicionarProduto(Produto novoProduto) throws ProdutoException{
+	public int adicionarProduto(Produto novoProduto) throws DAOException{
 		
 		String sql = "insert into PRODUTO (NOME,PRECO) values(?,?)";
 		int retorno = -1;
@@ -37,13 +38,13 @@ public class ProdutoDAO {
 		} catch (SQLException e) {
 			System.out.println("SQLException " + e.getMessage());
 			e.printStackTrace();
-			throw new ProdutoException();
+			throw new DAOException();
 		}
 		
 		return retorno;		
 	}
 	
-	public int removerProduto(int id) throws ProdutoException{
+	public int removerProduto(int id) throws DAOException{
 		
 		int retorno = -1;
 		String sql = "delete from PRODUTO where id=?";
@@ -58,17 +59,17 @@ public class ProdutoDAO {
 			con.close();
 			if(retorno == 0){
 				String msg = "O ID informado nao corresponde a um produto";
-				throw new ProdutoException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 		} catch (SQLException e) {
 			System.out.println("SQLException " + e.getMessage());
 			e.printStackTrace();
-			throw new ProdutoException();
+			throw new DAOException();
 		}		
 		return retorno;		
 	}
 	
-	public int atualizarProduto(int id, String novoNome, float novoPreco) throws ProdutoException{
+	public int atualizarProduto(int id, String novoNome, float novoPreco) throws DAOException{
 		
 		int retorno = -1;
 		String sql = "update PRODUTO set NOME=?, PRECO=? where ID=?";
@@ -85,17 +86,17 @@ public class ProdutoDAO {
 			con.close();
 			if(retorno == 0){
 				String msg = "O ID informado nao corresponde a um produto";
-				throw new ProdutoException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}			
 		} catch (SQLException e) {
 			System.out.println("SQLException " + e.getMessage());
 			e.printStackTrace();
-			throw new ProdutoException();
+			throw new DAOException();
 		}		
 		return retorno;		
 	}
 	
-	public ArrayList<Produto> procurarProdutoMaior(float preco) throws ProdutoException{
+	public ArrayList<Produto> procurarProdutoMaior(float preco) throws DAOException{
 		ArrayList<Produto> retorno = new ArrayList<Produto>();
 		Produto produto = null;
 		String sql = "select * from PRODUTO where PRECO > ? order by PRECO";
@@ -118,7 +119,7 @@ public class ProdutoDAO {
 				stmt.close();
 				con.close();				
 				String msg = "Nao ha Produtos nessa faixa de preco.";
-				throw new ProdutoException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			while(rs.next()){				
@@ -133,14 +134,13 @@ public class ProdutoDAO {
 			con.close();
 			
 		} catch (SQLException e) {			
-			e.printStackTrace();
-			throw new ProdutoException();
+			throw new DAOException();
 		}
 		
 		return retorno;
 	}
 	
-	public ArrayList<Produto> procurarProdutoMenor(float preco) throws ProdutoException{
+	public ArrayList<Produto> procurarProdutoMenor(float preco) throws DAOException{
 		ArrayList<Produto> retorno = new ArrayList<Produto>();
 		Produto produto = null;
 		String sql = "select * from PRODUTO where PRECO < ? order by PRECO";
@@ -163,7 +163,7 @@ public class ProdutoDAO {
 				stmt.close();
 				con.close();				
 				String msg = "Nao ha Produtos nessa faixa de preco.";
-				throw new ProdutoException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			while(rs.next()){				
@@ -178,14 +178,13 @@ public class ProdutoDAO {
 			con.close();
 			
 		} catch (SQLException e) {			
-			e.printStackTrace();
-			throw new ProdutoException();
+			throw new DAOException();
 		}
 		
 		return retorno;
 	}
 	
-	public ArrayList<Produto> procurarProdutoFaixa(float menor, float maior) throws ProdutoException{
+	public ArrayList<Produto> procurarProdutoFaixa(float menor, float maior) throws DAOException{
 		ArrayList<Produto> retorno = new ArrayList<Produto>();
 		Produto produto = null;
 		String sql = "select * from PRODUTO where PRECO < ? and PRECO > ? order by PRECO";
@@ -209,7 +208,7 @@ public class ProdutoDAO {
 				stmt.close();
 				con.close();				
 				String msg = "Nao ha Produtos nessa faixa de preco.";
-				throw new ProdutoException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			while(rs.next()){				
@@ -224,14 +223,13 @@ public class ProdutoDAO {
 			con.close();
 			
 		} catch (SQLException e) {			
-			e.printStackTrace();
-			throw new ProdutoException();
+			throw new DAOException();
 		}
 		
 		return retorno;
 	}
 	
-	public Produto procurarProduto(int id) throws ProdutoException{
+	public Produto procurarProduto(int id) throws DAOException{
 		
 		Produto retorno = null;
 		String sql = "select * from PRODUTO where ID=?";
@@ -248,7 +246,7 @@ public class ProdutoDAO {
 				stmt.close();
 				con.close();
 				String msg = "O ID informado nao corresponde a um produto";
-				throw new ProdutoException(msg);
+				throw new DAOException(msg,Status.NOT_FOUND);
 			}
 			
 			retorno = new Produto(id);
@@ -257,19 +255,14 @@ public class ProdutoDAO {
 			
 			rs.close();
 			stmt.close();
-			con.close();
-			
+			con.close();			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new ProdutoException();
-		}
-		
-		return retorno;
-		
+			throw new DAOException();
+		}		
+		return retorno;		
 	}
 
-	public ArrayList<Produto> listarProdutos() throws ProdutoException{
+	public ArrayList<Produto> listarProdutos() throws DAOException{
 		
 		ArrayList<Produto> retorno = new ArrayList<Produto>();
 		Produto produto;
@@ -294,16 +287,12 @@ public class ProdutoDAO {
 			con.close();			
 			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-			throw new ProdutoException();
-		}
-				
-		return retorno;
-		
+			throw new DAOException();
+		}			
+		return retorno;		
 	}
 	
-	public boolean verificarExistenciaProduto(int id){
+	public boolean verificarExistenciaProduto(int id) throws DAOException{
 		
 		boolean retorno = false;
 		String sql = "select ID from PRODUTO where ID=?";
@@ -320,23 +309,8 @@ public class ProdutoDAO {
 			con.close();
 			
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
-			e.printStackTrace();
-		}
-		
-		return retorno;
-		
+			throw new DAOException();
+		}		
+		return retorno;		
 	}
-	
-/*	
-	public static void main(String[] args) throws ProdutoException {
-		
-		ProdutoDAO teste = new ProdutoDAO();
-		
-		System.out.println(teste.procurarProduto(0).toString());
-		
-		//teste.listarProdutos().forEach(i -> System.out.println(i.toString()));
-		
-	}
-*/
 }
