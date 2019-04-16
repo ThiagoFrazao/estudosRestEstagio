@@ -35,6 +35,9 @@ public class ClienteDAO {
 			stmt.setString(4, novoCliente.getCidade());
 			
 			retorno = stmt.executeUpdate();
+			if(retorno == 0){
+				throw new SQLException();
+			}			
 			stmt.close();
 			con.close();
 			

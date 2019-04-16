@@ -52,6 +52,11 @@ public class Resposta {
 	public void setMensagem(String mensagem) {
 		this.mensagem = mensagem;
 	}
+
+	public static Response montarRespostaCriacao(String uriObjeto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 
 

@@ -18,6 +18,7 @@ public class RestApplication extends Application {
 	@GET
 	@ManagedAsync
 	public void testandoServidor(@Suspended AsyncResponse response){
+		
 		response.resume(Resposta.montarResposta(Status.OK, "Servidor funcionando corretamente"));
 	}	
 }
