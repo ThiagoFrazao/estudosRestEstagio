@@ -1,9 +1,13 @@
 package entidades;
 
+import javax.validation.constraints.NotNull;
+
 public class Venda {
 	
 	private int id;
+	@NotNull
 	private float total;
+	@NotNull
 	private Cliente cliente;
 	
 	public Venda(){

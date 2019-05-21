@@ -27,10 +27,16 @@ public class Resposta {
 		return Response.status(Status.OK).entity(mensagem).build();		
 	}
 	
-	public static Response montarRespostaSucesso(Status st){
-		String mensagem = formatarMensagem("Operação efetuada com sucesso.");		
-		return Response.status(st).entity(mensagem).build();		
+	public static Response montarRespostaCriacao() {
+		String msg = formatarMensagem("Recurso criado com sucesso.");
+		return Response.status(Status.CREATED).entity(msg).build();
 	}
+	
+	public static Response montarRespostaCriacao(String uriObjeto) {
+		String msg = formatarMensagem("Recurso criado com sucesso.");
+		return Response.status(Status.CREATED).header("Link", uriObjeto).entity(msg).build();
+	}
+	
 	
 	private static String formatarMensagem(String msg){		
 		String resposta = "{ \"resposta\": \"" + msg + "\" }";		
@@ -53,10 +59,6 @@ public class Resposta {
 		this.mensagem = mensagem;
 	}
 
-	public static Response montarRespostaCriacao(String uriObjeto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 
 

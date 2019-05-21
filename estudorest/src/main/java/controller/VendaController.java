@@ -14,8 +14,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,13 +29,16 @@ import entidades.Venda;
 import erros.DAOException;
 import utils.Resposta;
 
-@Path("/loja/vendas")
+@Path("/vendas")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class VendaController {
 	
 	@Inject
 	private VendaDAO vendaDAO;
+	
+	@Context
+	private UriInfo info;
 	
 	@GET
 	@ManagedAsync

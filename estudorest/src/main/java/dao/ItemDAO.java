@@ -30,6 +30,7 @@ public class ItemDAO {
 	
 	public int adicionarItem(Item novoItem) throws DAOException{
 		int retorno = -1;
+		int update = -1;
 		String sql = "insert into ITENS (VENDAID,PRODUTOID,ITEM,QUANTIDADE,CUSTO) values (?,?,?,?,?)";
 		
 		if(this.vendas.verificarExistencia(novoItem.getVenda().getId()) && this.produtos.verificarExistenciaProduto(novoItem.getProduto().getId())){
@@ -43,11 +44,12 @@ public class ItemDAO {
 				stmt.setInt(4, novoItem.getQuantidade());
 				stmt.setInt(5, novoItem.getCusto());
 				
-				retorno = stmt.executeUpdate();
+				update = stmt.executeUpdate();
+				if(update == 0){
+					throw new DAOException();
+				}
 				stmt.close();		
-				con.close();
-				
-				
+				con.close();				
 			} catch (SQLException e) {
 				throw new DAOException();
 			}

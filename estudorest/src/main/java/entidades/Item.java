@@ -1,8 +1,12 @@
 package entidades;
 
+import javax.validation.constraints.NotNull;
+
 public class Item {
 	
+	@NotNull
 	private Venda venda;
+	@NotNull
 	private Produto produto;
 	private int codItem;
 	private int quantidade;
@@ -25,10 +29,8 @@ public class Item {
 	}
 	
 	// validar todos os campos
-	public boolean validarItem(){	
-		
-		return this.getVenda() != null && this.getProduto() != null && this.getCusto() > 0 && 
-				  this.getQuantidade() > 0 && this.getCodItem() > 0;
+	public boolean validarItem(){			
+		return this.getCusto() > 0 && this.getQuantidade() > 0 && this.getCodItem() > 0;
 	}
 	
 	// validar 2 campos

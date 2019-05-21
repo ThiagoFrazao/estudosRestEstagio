@@ -6,19 +6,22 @@ import javax.ws.rs.Path;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.server.ManagedAsync;
 
 import utils.Resposta;
 
-@ApplicationPath("/rest")
-@Path("/loja")
+@ApplicationPath("/rest/loja")
+@Path("")
 public class RestApplication extends Application {	
+	
 	@GET
 	@ManagedAsync
-	public void testandoServidor(@Suspended AsyncResponse response){
+	public void testandoServidor(@Suspended AsyncResponse response, @Context UriInfo uriInfo){
 		
-		response.resume(Resposta.montarResposta(Status.OK, "Servidor funcionando corretamente"));
+		response.resume(Resposta.montarResposta(Status.OK, "Servidor funcionando corretamente no caminho: " + uriInfo.getBaseUri().toString()));
 	}	
 }

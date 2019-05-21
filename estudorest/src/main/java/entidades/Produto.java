@@ -1,11 +1,15 @@
 package entidades;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class Produto {
 	
 	private int id;
+	@NotNull
 	private String nome;
+	@NotNull
 	private float preco;
 	
 	public Produto(){
