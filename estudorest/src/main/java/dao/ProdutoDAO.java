@@ -313,4 +313,28 @@ public class ProdutoDAO {
 		}		
 		return retorno;		
 	}
+	
+public boolean verificarExistenciaProduto(String nome) throws DAOException{
+		
+		boolean retorno = false;
+		String sql = "select ID from PRODUTO where NOME=?";
+		
+		try {
+			Connection con = dao.getConexao();
+			PreparedStatement stmt = con.prepareStatement(sql);
+			stmt.setString(1, nome);
+			
+			ResultSet rs = stmt.executeQuery();
+			retorno = rs.next();
+			rs.close();
+			stmt.close();
+			con.close();
+			
+		} catch (SQLException e) {
+			throw new DAOException();
+		}		
+		return retorno;		
+	}
+	
+	
 }

@@ -114,8 +114,17 @@ public class ProdutoController {
 	public void adicionarProdutoNovo(Produto novoProduto, @Suspended AsyncResponse response){	
 		Response retorno = null;		
 		try {
-			produtoDAO.adicionarProduto(novoProduto);
-			retorno = Resposta.montarRespostaCriacao();
+			if(novoProduto.verificarValidade()){
+				if(!produtoDAO.verificarExistenciaProduto(novoProduto.getNome())){
+					produtoDAO.adicionarProduto(novoProduto);
+					retorno = Resposta.montarRespostaCriacao();
+				} else {
+					retorno = Resposta.montarResposta(Status.CONFLICT, "O Produto" + novoProduto.getNome() + " ja esta cadastrado.");
+				}				
+			} else {
+				retorno = Resposta.montarResposta(Status.BAD_GATEWAY, "Informacoes insuficientes para registrar Produto.");
+			}
+			
 		} catch (DAOException e) {
 			retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 		}		
@@ -136,7 +145,7 @@ public class ProdutoController {
 				retorno = Resposta.montarResposta(e.getStatus(), e.getMessage());
 			}
 		}else{
-			retorno = Resposta.montarResposta(Status.BAD_REQUEST, "Informacoes insuficientes.");
+			retorno = Resposta.montarResposta(Status.BAD_REQUEST, "Informacoes insuficientes para atualizar Produto.");
 		}		
 		response.resume(retorno);
 	}
