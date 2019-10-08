@@ -31,4 +31,7 @@
 <fullyQualifiedTypeName name="java.sql.SQLException"/>
 <fullyQualifiedTypeName name="javax.ws.rs.Produces"/>
 <fullyQualifiedTypeName name="javax.ws.rs.HeaderParam"/>
+<fullyQualifiedTypeName name="javax.ws.rs.core.Response"/>
+<fullyQualifiedTypeName name="utils.Resposta"/>
+<fullyQualifiedTypeName name="javax.ws.rs.core.Response.Status"/>
 </qualifiedTypeNameHistroy>

@@ -2,19 +2,20 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="listar" key="selection"/>
+		<item value="verificar" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
+			<item value="verificar"/>
+			<item value="verifica"/>
 			<item value="listar"/>
 			<item value="ad"/>
 			<item value="@PUT"/>
 			<item value="public static Response montarRespostaCriacao(String uriObjeto) {"/>
 			<item value="@put"/>
 			<item value="put"/>
-			<item value="ip"/>
 		</list>
 		<list key="replacehistory">
 		</list>

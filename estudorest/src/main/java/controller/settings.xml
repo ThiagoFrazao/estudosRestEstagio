@@ -1,0 +1,17 @@
+ <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                          https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+      <localRepository>C:/Users/F514189/.m2/repository</localRepository>
+
+      <mirrors>
+        <mirror>
+          <id>nexus_caixa</id>
+          <name>Sonatype Nexus</name>
+          <url>http://srjdeaprnt0004.corerj.caixa:8099/nexus/content/groups/caixa-group/</url>
+          <mirrorOf>central</mirrorOf>
+        </mirror>
+      </mirrors>
+
+    </settings>
